@@ -3,6 +3,9 @@ import tkinter as tk
 import time
 from wonderwords import RandomWord
 
+WAIT_PERIOD = 50
+MOVE_PIXELS = 3
+
 def handle_any_key(event):
     global y, success, y_at_success
     current_string = event.widget.get()+event.char
@@ -11,7 +14,7 @@ def handle_any_key(event):
         y_at_success = y
         y = screen_height
 
-    # Initialize the generator
+# Initialize the generator
 rw = RandomWord()
 
 # Set up the main window
@@ -48,11 +51,11 @@ def fall():
     global text_id
     global moving_text
 
-    canvas.move(text_id, 0, 3)  # Move 3 pixels down
-    y += 3
+    canvas.move(text_id, 0, MOVE_PIXELS)  # Move 3 pixels down
+    y += MOVE_PIXELS
 
     if y < screen_height-70:
-        root.after(50, fall)  # Repeat every 50 milliseconds
+        root.after(WAIT_PERIOD, fall)  # Repeat every WAIT milliseconds
     else:
         if success :
             global new_score, total_score, best_score
@@ -62,13 +65,12 @@ def fall():
             new_score = int((speed_score + difficulty_score)/2)
             total_score+=new_score
             best_score += 100
-            canvas.itemconfig(score_id, text=str(total_score)+"/"+str(best_score))
-            canvas.coords(score_id, screen_width - 100, screen_height-100)
-            print(total_score)
-            print(score_id)
             success = False
         else:
             canvas.configure(background="red")
+            best_score += 100
+        canvas.itemconfig(score_id, text=str(total_score) + "/" + str(best_score))
+        canvas.coords(score_id, screen_width - 100, screen_height - 100)
         canvas.update()
         time.sleep(2)
         canvas.delete(text_id)
@@ -79,8 +81,7 @@ def fall():
         # Reset to top at a new X position when it hits the bottom
         canvas.coords(text_id, random.randint(50, screen_width-40), 0)
         y = 0
-        root.after(50, fall)
-
+        root.after(WAIT_PERIOD, fall)
 
 # Start the animation loop
 fall()
