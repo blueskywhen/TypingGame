@@ -1,6 +1,7 @@
 import random
 import tkinter as tk
 import time
+import WordExplosion
 from wonderwords import RandomWord
 
 WAIT_PERIOD = 50
@@ -27,6 +28,8 @@ root.geometry("400x500")
 # Create a canvas to draw on
 canvas = tk.Canvas(root, width=screen_width-10, height=screen_height-10, bg="black")
 canvas.pack(fill="both", expand=True)
+
+app = WordExplosion.TextExplosionApp(root, canvas)
 
 entry = tk.Entry(root, width=30, background="white")
 entry.pack(pady=10)
@@ -60,19 +63,20 @@ def fall():
         if success :
             global new_score, total_score, best_score
             canvas.configure(background="green")
-            speed_score = ((screen_height - y_at_success)/screen_height)*100
+            speed_score = ((screen_height + 30 - y_at_success)/screen_height)*100
             difficulty_score = (len(moving_text)/12)*100
             new_score = int((speed_score + difficulty_score)/2)
             total_score+=new_score
-            best_score += 100
             success = False
+            WordExplosion.TextExplosionApp.trigger_explosion(app, text_id, moving_text)
         else:
             canvas.configure(background="red")
-            best_score += 100
+            canvas.update()
+            time.sleep(2)
+        best_score += 100
         canvas.itemconfig(score_id, text=str(total_score) + "/" + str(best_score))
         canvas.coords(score_id, screen_width - 100, screen_height - 100)
         canvas.update()
-        time.sleep(2)
         canvas.delete(text_id)
         entry.delete(0, tk.END)
         canvas.configure(background="black")
