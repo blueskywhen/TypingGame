@@ -63,9 +63,9 @@ def fall():
         if success :
             global new_score, total_score, best_score
             canvas.configure(background="green")
-            speed_score = ((screen_height + 30 - y_at_success)/screen_height)*100
+            speed_score = ((screen_height + 40 - y_at_success)/screen_height)*100
             difficulty_score = (len(moving_text)/12)*100
-            new_score = int((speed_score + difficulty_score)/2)
+            new_score = int((speed_score*0.8) + (difficulty_score*0.2))
             total_score+=new_score
             success = False
             WordExplosion.TextExplosionApp.trigger_explosion(app, text_id, moving_text)
@@ -83,7 +83,7 @@ def fall():
         moving_text = rw.word()
         text_id = canvas.create_text(x, y, text=moving_text, fill="white", font=("Arial", 14))
         # Reset to top at a new X position when it hits the bottom
-        canvas.coords(text_id, random.randint(50, screen_width-40), 0)
+        canvas.coords(text_id, random.randint(50, screen_width-50), 0)
         y = 0
         root.after(WAIT_PERIOD, fall)
 
