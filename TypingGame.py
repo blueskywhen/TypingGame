@@ -3,9 +3,17 @@ import tkinter as tk
 import time
 import WordExplosion
 from wonderwords import RandomWord
+from playsound import playsound
+from multiprocessing import Process
 
 WAIT_PERIOD = 50
 MOVE_PIXELS = 3
+
+def play_sound(success):
+    if success:
+        playsound("success.mp3")
+    else:
+        playsound("failure.mp3")
 
 def handle_any_key(event):
     global y, success, y_at_success
@@ -14,40 +22,6 @@ def handle_any_key(event):
         success=True
         y_at_success = y
         y = screen_height
-
-# Initialize the generator
-rw = RandomWord()
-
-# Set up the main window
-root = tk.Tk()
-root.title("Falling Word")
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
-root.geometry("400x500")
-
-# Create a canvas to draw on
-canvas = tk.Canvas(root, width=screen_width-10, height=screen_height-10, bg="black")
-canvas.pack(fill="both", expand=True)
-
-app = WordExplosion.TextExplosionApp(root, canvas)
-
-entry = tk.Entry(root, width=30, background="white")
-entry.pack(pady=10)
-entry.bind("<Key>", handle_any_key)
-canvas_entry_id = canvas.create_window(600, 600, window=entry)
-
-success = False
-x = 100
-y = 0
-new_score = 0
-total_score = 0
-best_score = 0
-moving_text = rw.word()
-text_id = canvas.create_text(x, y, text=moving_text, fill="white", font=("Arial", 14))
-score_id = canvas.create_text(screen_width - 40, screen_height-40, text=str(total_score),
-                              fill="white", font=("Arial", 16))
-# Starting vertical position
-y_pos = 20
 
 def fall():
     global y, success, y_at_success
@@ -69,8 +43,15 @@ def fall():
             total_score+=new_score
             success = False
             WordExplosion.TextExplosionApp.trigger_explosion(app, text_id, moving_text)
+
+            p1 = Process(target=play_sound, args=(True,))
+            p1.start()
         else:
             canvas.configure(background="red")
+
+            p2 = Process(target=play_sound, args=(False,))
+            p2.start()
+
             canvas.update()
             time.sleep(2)
         best_score += 100
@@ -87,6 +68,41 @@ def fall():
         y = 0
         root.after(WAIT_PERIOD, fall)
 
-# Start the animation loop
-fall()
-root.mainloop()
+if __name__ == '__main__':
+    # Initialize the generator
+    rw = RandomWord()
+
+    # Set up the main window
+    root = tk.Tk()
+    root.title("Falling Word")
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    root.geometry("400x500")
+
+    # Create a canvas to draw on
+    canvas = tk.Canvas(root, width=screen_width-10, height=screen_height-10, bg="black")
+    canvas.pack(fill="both", expand=True)
+
+    app = WordExplosion.TextExplosionApp(root, canvas)
+
+    entry = tk.Entry(root, width=30, background="white")
+    entry.pack(pady=10)
+    entry.bind("<Key>", handle_any_key)
+    canvas_entry_id = canvas.create_window(600, 600, window=entry)
+
+    success = False
+    x = 100
+    y = 0
+    new_score = 0
+    total_score = 0
+    best_score = 0
+    moving_text = rw.word()
+    text_id = canvas.create_text(x, y, text=moving_text, fill="white", font=("Arial", 14))
+    score_id = canvas.create_text(screen_width - 40, screen_height-40, text=str(total_score),
+                                  fill="white", font=("Arial", 16))
+    # Starting vertical position
+    y_pos = 20
+
+    # Start the animation loop
+    fall()
+    root.mainloop()
