@@ -8,6 +8,7 @@ from multiprocessing import Process
 
 WAIT_PERIOD = 50
 MOVE_PIXELS = 3
+REF_CHAR_PER_SECOND = 3
 
 def play_sound(success):
     if success:
@@ -37,9 +38,12 @@ def fall():
         if success :
             global new_score, total_score, best_score
             canvas.configure(background="green")
-            speed_score = ((screen_height + 40 - y_at_success)/screen_height)*100
-            difficulty_score = (len(moving_text)/12)*100
-            new_score = int((speed_score*0.8) + (difficulty_score*0.2))
+            Actual_Time = (y_at_success/float(MOVE_PIXELS)) * float(WAIT_PERIOD)
+            Ref_Time = (len(moving_text)/float(REF_CHAR_PER_SECOND)) * 1000
+            speed_score = (Ref_Time/Actual_Time)*100
+            #difficulty_score = (len(moving_text)/12)*100
+            #new_score = int((speed_score*0.8) + (difficulty_score*0.2))
+            new_score = int(speed_score)
             total_score+=new_score
             success = False
             WordExplosion.TextExplosionApp.trigger_explosion(app, text_id, moving_text)
